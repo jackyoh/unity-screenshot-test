@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using UnityEngine;
-using UnityEditor;
 
 public class TestCamera : MonoBehaviour {
     [SerializeField] private TilemapRenderer tilemapRenderer;
@@ -18,8 +17,8 @@ public class TestCamera : MonoBehaviour {
         */
         //string filePath = "/home/user1/aaa/result2.png";
         
-        string filePath = Application.persistentDataPath + 
-            "/" + FileUtil.GetUniqueTempPathInProject().Replace("Temp/", "") + ".png";
+        //Debug.Log(Application.dataPath);
+        string filePath = Application.persistentDataPath + "/result.png"; 
         RenderTexture rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 24);
         Camera screenshotCamera = GetComponent<Camera>();
         screenshotCamera.CopyFrom(Camera.main);

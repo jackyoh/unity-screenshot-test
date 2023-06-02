@@ -18,18 +18,18 @@ public class TestCamera : MonoBehaviour {
         //string filePath = "/home/user1/aaa/result2.png";
         //Debug.Log(Application.dataPath);
 
-        //string filePath = Application.persistentDataPath + "/result.png"; 
-        string filePath = "/home/user1/aaa/result1.png";
+        string filePath = Application.persistentDataPath + "/result1.png"; 
+        //string filePath = "/home/user1/aaa/result1.png";
 
         RenderTexture rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 24);
-        //Camera screenshotCamera = GetComponent<Camera>();
-        //screenshotCamera.CopyFrom(Camera.main);
+        Camera screenshotCamera = GetComponent<Camera>();
+        screenshotCamera.CopyFrom(Camera.main);
 
-        Camera.main.targetTexture = rt;
-        Camera.main.backgroundColor = Color.white;
+        screenshotCamera.targetTexture = rt;
+        screenshotCamera.backgroundColor = Color.white;
         tilemapRenderer.enabled = false;
-        Camera.main.Render();
-        Camera.main.backgroundColor = originalBackground;
+        screenshotCamera.Render();
+        screenshotCamera.backgroundColor = originalBackground;
         tilemapRenderer.enabled = true;
 
         /*Debug.Log("Width:" + Screen.width / 2 + ", Height:" + Screen.height / 2);
@@ -73,6 +73,6 @@ public class TestCamera : MonoBehaviour {
 
         RenderTexture.ReleaseTemporary(rt);
         RenderTexture.active = null;
-        Camera.main.targetTexture = null;
+        screenshotCamera.targetTexture = null;
     }
 }

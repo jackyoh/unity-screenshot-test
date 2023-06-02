@@ -16,9 +16,11 @@ public class TestCamera : MonoBehaviour {
         string filePath = "/home/user1/aaa/result2.png";
         */
         //string filePath = "/home/user1/aaa/result2.png";
-        
         //Debug.Log(Application.dataPath);
+
         string filePath = Application.persistentDataPath + "/result.png"; 
+        //string filePath = "/home/user1/aaa/result1.png";
+
         RenderTexture rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 24);
         Camera screenshotCamera = GetComponent<Camera>();
         screenshotCamera.CopyFrom(Camera.main);
@@ -40,8 +42,11 @@ public class TestCamera : MonoBehaviour {
         var x = rectTransform.offsetMin.x;
         var y = rectTransform.offsetMin.y;*/
         
-        int width = 450;
-        int height = 300;
+        //int width = 450;
+        //int height = 300;
+
+        int width = Screen.width;
+        int height = Screen.height;
         int x = 0;
         int y = 0;
 

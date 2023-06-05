@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using UnityEngine;
+using System.Linq;
+
 
 using Amazon;
 using Amazon.Runtime;
@@ -21,6 +23,7 @@ using Amazon.S3.Transfer;
 public class TestCamera : MonoBehaviour {
     [SerializeField] private TilemapRenderer tilemapRenderer;
     [SerializeField] private RectTransform rectTransform;
+    
 
     public async void Start() {
         Color originalBackground = Camera.main.backgroundColor;
@@ -30,10 +33,11 @@ public class TestCamera : MonoBehaviour {
         string filePath = "/home/user1/aaa/result2.png";
         string applicationDataPath = Application.dataPath;
         */
-
-        string filePath = "/home/user1/aaa/result1.png";
-        //string filePath = Application.persistentDataPath + "/result1.png"; 
+        string fileName = RandomString(5) + ".png";
+        //string filePath = "/home/user1/aaa/" + fileName;
+        string filePath = Application.persistentDataPath + "/" + fileName; 
         
+
         RenderTexture rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 24);
         Camera screenshotCamera = GetComponent<Camera>();
         screenshotCamera.CopyFrom(Camera.main);
@@ -51,17 +55,17 @@ public class TestCamera : MonoBehaviour {
         Debug.Log("Top:" + rectTransform.offsetMax.y);
         Debug.Log("Bottom:" + rectTransform.offsetMin.y);*/
 
-        /*var width = Screen.width - (Mathf.Abs(rectTransform.offsetMin.x) + Mathf.Abs(rectTransform.offsetMax.x));
+        var width = Screen.width - (Mathf.Abs(rectTransform.offsetMin.x) + Mathf.Abs(rectTransform.offsetMax.x));
         var height = Screen.height - (Mathf.Abs(rectTransform.offsetMin.y) + Mathf.Abs(rectTransform.offsetMax.y));
         var x = rectTransform.offsetMin.x;
-        var y = rectTransform.offsetMin.y;*/
+        var y = rectTransform.offsetMin.y;
         //int width = 450;
         //int height = 300;
 
-        int width = Screen.width;
+        /*int width = Screen.width;
         int height = Screen.height;
         int x = 0;
-        int y = 0;
+        int y = 0;*/
 
         Texture2D texture = new Texture2D((int)width, (int)height, TextureFormat.RGB24, false);        
         RenderTexture.active = rt;
@@ -111,8 +115,6 @@ public class TestCamera : MonoBehaviour {
         InitiateAuthResponse response = await cognitoService.InitiateAuthAsync(authRequest);
         var authResult = response.AuthenticationResult;
         string idToken = authResult.IdToken;
-        Debug.Log("ID TOKEN:" + idToken);
-
 
         CognitoAWSCredentials credentials = 
             new CognitoAWSCredentials("us-east-1:176365b4-d93d-4589-a8a2-68f41ed6a31d", RegionEndpoint.USEast1);
@@ -139,15 +141,23 @@ public class TestCamera : MonoBehaviour {
         }
         Debug.Log(files);*/
         
-
         // Upload png file to s3
         var s3Client = new AmazonS3Client(credentialsIdentity.Credentials, RegionEndpoint.USEast1);
         TransferUtility utility = new TransferUtility(s3Client);
         TransferUtilityUploadRequest request = new TransferUtilityUploadRequest();
         request.BucketName = "amplify-unitytest-dev-164133-deployment";
-        request.Key = "result.png";
+        request.Key = fileName;
         request.FilePath = filePath;
+        
         utility.Upload(request);
         //-------------[Upload data to S3 storage]----------------
     }
+
+    private string RandomString(int length) {
+        System.Random random = new System.Random();
+        string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+    } 
+
 }

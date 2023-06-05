@@ -23,21 +23,22 @@ using Amazon.S3.Transfer;
 public class TestCamera : MonoBehaviour {
     [SerializeField] private TilemapRenderer tilemapRenderer;
     [SerializeField] private RectTransform rectTransform;
-    
+    [SerializeField] private RectTransform tileMapRectTransform;
 
     public async void Start() {
         Color originalBackground = Camera.main.backgroundColor;
+        
         /*
         string persistentDataPath = Application.persistentDataPath;
         string temporaryCachePath = Application.temporaryCachePath;
         string filePath = "/home/user1/aaa/result2.png";
         string applicationDataPath = Application.dataPath;
         */
+
         string fileName = RandomString(5) + ".png";
         //string filePath = "/home/user1/aaa/" + fileName;
         string filePath = Application.persistentDataPath + "/" + fileName; 
         
-
         RenderTexture rt = RenderTexture.GetTemporary(Screen.width, Screen.height, 24);
         Camera screenshotCamera = GetComponent<Camera>();
         screenshotCamera.CopyFrom(Camera.main);
@@ -55,10 +56,16 @@ public class TestCamera : MonoBehaviour {
         Debug.Log("Top:" + rectTransform.offsetMax.y);
         Debug.Log("Bottom:" + rectTransform.offsetMin.y);*/
 
-        var width = Screen.width - (Mathf.Abs(rectTransform.offsetMin.x) + Mathf.Abs(rectTransform.offsetMax.x));
+        /*var width = Screen.width - (Mathf.Abs(rectTransform.offsetMin.x) + Mathf.Abs(rectTransform.offsetMax.x));
         var height = Screen.height - (Mathf.Abs(rectTransform.offsetMin.y) + Mathf.Abs(rectTransform.offsetMax.y));
         var x = rectTransform.offsetMin.x;
-        var y = rectTransform.offsetMin.y;
+        var y = rectTransform.offsetMin.y;*/
+
+        var width = Screen.width - (Mathf.Abs(tileMapRectTransform.offsetMin.x) + Mathf.Abs(tileMapRectTransform.offsetMax.x));
+        var height = Screen.height - (Mathf.Abs(tileMapRectTransform.offsetMin.y) + Mathf.Abs(tileMapRectTransform.offsetMax.y));
+        var x = tileMapRectTransform.offsetMin.x;
+        var y = tileMapRectTransform.offsetMin.y;
+
         //int width = 450;
         //int height = 300;
 
@@ -72,7 +79,6 @@ public class TestCamera : MonoBehaviour {
         texture.ReadPixels(new Rect((int)x, (int)y, width, height), 0, 0);
         texture.Apply();
         byte[] bytes = texture.EncodeToPNG();
-
 
         Texture2D sourceTexture = new Texture2D((int)width, (int)height, TextureFormat.RGB24, false);
         sourceTexture.LoadImage(bytes);
@@ -159,5 +165,4 @@ public class TestCamera : MonoBehaviour {
         return new string(Enumerable.Repeat(chars, length)
             .Select(s => s[random.Next(s.Length)]).ToArray());
     } 
-
 }

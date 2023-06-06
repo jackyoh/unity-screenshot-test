@@ -66,7 +66,7 @@ public class ImageLoad : MonoBehaviour {
         
         Debug.Log("Local File Path:" + localFilePath);
 
-        var s3Client = new AmazonS3Client(credentialsIdentity.Credentials);
+        var s3Client = new AmazonS3Client(credentialsIdentity.Credentials, RegionEndpoint.USEast1);
 
         GetObjectRequest request = new GetObjectRequest {
             BucketName = "amplify-unitytest-dev-164133-deployment",

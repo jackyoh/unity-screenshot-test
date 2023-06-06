@@ -43,6 +43,7 @@ public class ImageLoad : MonoBehaviour {
         var authResult = response.AuthenticationResult;
         string idToken = authResult.IdToken;
 
+
         CognitoAWSCredentials credentials = 
             new CognitoAWSCredentials("us-east-1:176365b4-d93d-4589-a8a2-68f41ed6a31d", RegionEndpoint.USEast1);
         credentials.AddLogin("cognito-idp.us-east-1.amazonaws.com/us-east-1_aumofL5vx", idToken);
@@ -60,20 +61,32 @@ public class ImageLoad : MonoBehaviour {
 
 
         string localFilePath = Application.persistentDataPath + "/shake.png";
-        var s3Client = new AmazonS3Client(credentialsIdentity.Credentials);
-        TransferUtility utility = new TransferUtility(s3Client);
-        TransferUtilityDownloadRequest request = new TransferUtilityDownloadRequest();
-        request.BucketName = "amplify-unitytest-dev-164133-deployment";
-        request.Key = "shake.png";
-        request.FilePath = localFilePath;
-        utility.Download(request);
+        
+        Debug.Log("Local File Path:" + localFilePath);
 
-        // Debug.Log("Local File Path:" + localFilePath);
+        var s3Client = new AmazonS3Client(credentialsIdentity.Credentials);
+
+        GetObjectRequest request = new GetObjectRequest {
+            BucketName = "amplify-unitytest-dev-164133-deployment",
+            Key = "shake.png"
+        };
+
+        GetObjectResponse response1 = await s3Client.GetObjectAsync(request);        
+        using (StreamReader reader = new StreamReader(response1.ResponseStream)) {
+            using (var memstream = new MemoryStream()) {
+                var buffer = new byte[512];
+                var bytesRead = default(int);
+                while ((bytesRead = reader.BaseStream.Read(buffer, 0, buffer.Length)) > 0)
+                        memstream.Write(buffer, 0, bytesRead);
+                FileStream file = new FileStream(localFilePath, FileMode.Create, FileAccess.Write);
+                memstream.WriteTo(file);
+                file.Close();
+                memstream.Close();
+            }
+        }
         message.text = localFilePath;
 
-
-        string path = localFilePath;
-        var rawData = System.IO.File.ReadAllBytes(path);
+        var rawData = System.IO.File.ReadAllBytes(localFilePath);
         Texture2D texture2D = new Texture2D(2, 2);
         texture2D.LoadImage(rawData);
         

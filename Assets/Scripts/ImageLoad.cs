@@ -25,28 +25,30 @@ public class ImageLoad : MonoBehaviour {
         Application.runInBackground = true;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        IAmazonCognitoIdentityProvider cognitoService = 
-            new AmazonCognitoIdentityProviderClient(
-                new AnonymousAWSCredentials(), RegionEndpoint.USEast1
-            );
+        IAmazonCognitoIdentityProvider cognitoService;
+        cognitoService = new AmazonCognitoIdentityProviderClient(
+            new AnonymousAWSCredentials(), RegionEndpoint.USEast1
+        );
         string username = "user100";
         string password = "9775630345";
         var authParameters = new Dictionary<string, string>();
         authParameters.Add("USERNAME", username);
         authParameters.Add("PASSWORD", password);
+
         var authRequest = new InitiateAuthRequest {
             ClientId = "76dq8d06b7aio2v74trg8qn0uq",
             AuthParameters = authParameters,
             AuthFlow = AuthFlowType.USER_PASSWORD_AUTH,
         };
+
         InitiateAuthResponse response = await cognitoService.InitiateAuthAsync(authRequest);
         var authResult = response.AuthenticationResult;
         string idToken = authResult.IdToken;
 
-
         CognitoAWSCredentials credentials = 
             new CognitoAWSCredentials("us-east-1:176365b4-d93d-4589-a8a2-68f41ed6a31d", RegionEndpoint.USEast1);
         credentials.AddLogin("cognito-idp.us-east-1.amazonaws.com/us-east-1_aumofL5vx", idToken);
+
         AmazonCognitoIdentityClient cli = 
             new AmazonCognitoIdentityClient(credentials, RegionEndpoint.USEast1);
         var req = new Amazon.CognitoIdentity.Model.GetIdRequest();
@@ -92,5 +94,10 @@ public class ImageLoad : MonoBehaviour {
         
         Sprite sprite = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), new Vector2(0.5f, 0.5f), 100f, 1, SpriteMeshType.FullRect);
         GetComponent<SpriteRenderer>().sprite = sprite;
+    }
+
+    IEnumerator waitDownloadFile() {
+        yield return new WaitForSeconds(10);
+        
     }
 }

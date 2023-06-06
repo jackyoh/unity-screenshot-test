@@ -16,8 +16,10 @@ using Amazon.SecurityToken.Model;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using TMPro;
 
 public class ImageLoad : MonoBehaviour {
+    public TextMeshProUGUI message;
 
     public async void Start() {
         Application.runInBackground = true;
@@ -56,6 +58,7 @@ public class ImageLoad : MonoBehaviour {
         getCredentialReq.Logins.Add("cognito-idp.us-east-1.amazonaws.com/us-east-1_aumofL5vx", idToken);
         var credentialsIdentity = await cli.GetCredentialsForIdentityAsync(getCredentialReq);
 
+
         string localFilePath = Application.persistentDataPath + "/shake.png";
         var s3Client = new AmazonS3Client(credentialsIdentity.Credentials);
         TransferUtility utility = new TransferUtility(s3Client);
@@ -65,7 +68,9 @@ public class ImageLoad : MonoBehaviour {
         request.FilePath = localFilePath;
         utility.Download(request);
 
-        Debug.Log("Local File Path:" + localFilePath);
+        // Debug.Log("Local File Path:" + localFilePath);
+        message.text = localFilePath;
+
 
         string path = localFilePath;
         var rawData = System.IO.File.ReadAllBytes(path);
@@ -74,7 +79,5 @@ public class ImageLoad : MonoBehaviour {
         
         Sprite sprite = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), new Vector2(0.5f, 0.5f), 100f, 1, SpriteMeshType.FullRect);
         GetComponent<SpriteRenderer>().sprite = sprite;
-        
-
     }
 }

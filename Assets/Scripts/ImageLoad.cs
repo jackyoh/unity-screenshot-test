@@ -60,19 +60,21 @@ public class ImageLoad : MonoBehaviour {
         getCredentialReq.IdentityId = getIdResponse.IdentityId;
         getCredentialReq.Logins.Add("cognito-idp.us-east-1.amazonaws.com/us-east-1_aumofL5vx", idToken);
         var credentialsIdentity = await cli.GetCredentialsForIdentityAsync(getCredentialReq);
-
-
         string localFilePath = Application.persistentDataPath + "/shake.png";
         
+        var s3Client = new AmazonS3Client(credentialsIdentity.Credentials, RegionEndpoint.USEast1);
+        TransferUtility utility = new TransferUtility(s3Client);
+        TransferUtilityDownloadRequest request = new TransferUtilityDownloadRequest();
+        request.BucketName = "amplify-unitytest-dev-164133-deployment";
+        request.Key = "shake.png";
+        request.FilePath = localFilePath;
+        utility.Download(request);
         Debug.Log("Local File Path:" + localFilePath);
 
-        var s3Client = new AmazonS3Client(credentialsIdentity.Credentials, RegionEndpoint.USEast1);
-
-        GetObjectRequest request = new GetObjectRequest {
+        /*GetObjectRequest request = new GetObjectRequest {
             BucketName = "amplify-unitytest-dev-164133-deployment",
             Key = "shake.png"
         };
-
         GetObjectResponse response1 = await s3Client.GetObjectAsync(request);        
         using (StreamReader reader = new StreamReader(response1.ResponseStream)) {
             using (var memstream = new MemoryStream()) {
@@ -85,19 +87,14 @@ public class ImageLoad : MonoBehaviour {
                 file.Close();
                 memstream.Close();
             }
-        }
+        }*/
+
         message.text = localFilePath;
 
         var rawData = System.IO.File.ReadAllBytes(localFilePath);
-        Texture2D texture2D = new Texture2D(2, 2);
+        Texture2D texture2D = new Texture2D(500, 500);
         texture2D.LoadImage(rawData);
-        
-        Sprite sprite = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), new Vector2(0.5f, 0.5f), 100f, 1, SpriteMeshType.FullRect);
+        Sprite sprite = Sprite.Create(texture2D, new Rect(0, 0, texture2D.width, texture2D.height), new Vector2(1f, 1f), 100f, 1, SpriteMeshType.FullRect);
         GetComponent<SpriteRenderer>().sprite = sprite;
-    }
-
-    IEnumerator waitDownloadFile() {
-        yield return new WaitForSeconds(10);
-        
     }
 }
